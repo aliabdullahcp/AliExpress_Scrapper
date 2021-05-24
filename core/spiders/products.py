@@ -49,14 +49,13 @@ class ProductsSpider(scrapy.Spider):
 
         products = response.xpath("//div[@class='hover-help']/div[@class='item-title-wrap']/a")
 
-        if current_page < 5:  # len(products) > 0:
+        if len(products) > 0:
             for product in products:
                 product_link = product.xpath(".//@href").get()
                 yield SplashRequest(self.url_prefix + product_link, self.parse_product_details,
                                     endpoint='execute',
                                     args={'html': 1, 'lua_source': self.script, 'wait': 2},
                                     meta={'category': category})
-                break
 
             current_page += 1
             yield SplashRequest(url + str(current_page), self.parse,

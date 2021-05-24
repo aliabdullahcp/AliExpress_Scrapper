@@ -3,6 +3,11 @@ SPIDER_MODULES = ['core.spiders']
 NEWSPIDER_MODULE = 'core.spiders'
 ROBOTSTXT_OBEY = False
 
+# Configure Item Pipelines
+ITEM_PIPELINES = {
+    'core.pipelines.CorePipeline': 300,
+}
+
 # Splash Configurations
 SPLASH_URL = 'http://localhost:8050'
 DOWNLOADER_MIDDLEWARES = {
