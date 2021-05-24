@@ -11,4 +11,4 @@ class CoreItem(scrapy.Item):
     product_reviews = scrapy.Field()
     product_rating = scrapy.Field()
     product_orders = scrapy.Field()
-    product_image=scrapy.Field()
+    product_image = scrapy.Field()
