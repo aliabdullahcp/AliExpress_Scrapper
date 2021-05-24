@@ -5,11 +5,11 @@ from scrapy_splash import SplashRequest
 
 class ProductsSpider(scrapy.Spider):
     name = 'products'
-    current_page = 1
+
     url_prefix = 'https:'
     urls = ['https://www.aliexpress.com/category/200003482/dresses.html?page=',
-            'https://www.aliexpress.com/category/100003127/t-shirts.html?spm=a2g0o.home.101.4.650c2145HaFx24',
-            'https://www.aliexpress.com/category/200001648/blouses-shirts.html?spm=a2g0o.home.101.5.650c2145HaFx24']
+            'https://www.aliexpress.com/category/100003127/t-shirts.html?page=',
+            'https://www.aliexpress.com/category/200001648/blouses-shirts.html?page=']
     script = """
                 function main(splash)
                     local num_scrolls = 10
@@ -34,31 +34,44 @@ class ProductsSpider(scrapy.Spider):
                 """
 
     def start_requests(self):
+        start_page = 1
         for url in self.urls:
-            yield SplashRequest(url + str(self.current_page), self.parse,
+            yield SplashRequest(url + str(start_page), self.parse,
                                 endpoint='execute',
-                                args={'html': 1, 'lua_source': self.script, 'wait': 2}, meta={'source_url': url})
+                                args={'html': 1, 'lua_source': self.script, 'wait': 2},
+                                meta={'source_url': url, 'current_page': 1})
 
     def parse(self, response):
-        url = response.request.meta['source_url']
+        url = response.meta.get('source_url')
+        current_page = response.meta.get('current_page')
+
+        category = str(url).split('/')[5].split('.')[0]
+
         products = response.xpath("//div[@class='hover-help']/div[@class='item-title-wrap']/a")
-        if len(products) > 0:
+
+        if current_page < 5:  # len(products) > 0:
             for product in products:
                 product_link = product.xpath(".//@href").get()
                 yield SplashRequest(self.url_prefix + product_link, self.parse_product_details,
                                     endpoint='execute',
-                                    args={'html': 1, 'lua_source': self.script, 'wait': 2})
+                                    args={'html': 1, 'lua_source': self.script, 'wait': 2},
+                                    meta={'category': category})
+                break
 
-            self.current_page += 1
-            yield SplashRequest(url + str(self.current_page), self.parse,
+            current_page += 1
+            yield SplashRequest(url + str(current_page), self.parse,
                                 endpoint='execute',
-                                args={'html': 1, 'lua_source': self.script, 'wait': 2})
+                                args={'html': 1, 'lua_source': self.script, 'wait': 2},
+                                meta={'source_url': url, 'current_page': current_page})
 
     def parse_product_details(self, response):
         product = CoreItem()
-        product['product_title'] = response.xpath("//h1[@class='product-title-text']/text()").get()
-        product['product_rating'] = response.xpath("//span[@class='overview-rating-average']/text()").get()
-        product['product_reviews'] = response.xpath("//span[@class='product-reviewer-reviews black-link']/text()").get()
-        product['product_orders'] = response.xpath("//span[@class='product-reviewer-sold']/text()").get()
-        product['product_image'] = response.xpath("//img[@class='magnifier-image']/@src").get()
+        product['Product_Category'] = response.meta.get('category')
+        product['Product_Title'] = response.xpath("//h1[@class='product-title-text']/text()").get()
+        product['Product_Rating'] = response.xpath("//span[@class='overview-rating-average']/text()").get()
+        product['Product_Image'] = response.xpath("//img[@class='magnifier-image']/@src").get()
+        reviews = response.xpath("//span[@class='product-reviewer-reviews black-link']/text()").get()
+        orders = response.xpath("//span[@class='product-reviewer-sold']/text()").get()
+        product['Product_Reviews'] = str(reviews).split()[0]
+        product['Product_Orders'] = str(orders).split()[0]
         yield product

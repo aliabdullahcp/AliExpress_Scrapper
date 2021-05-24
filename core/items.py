@@ -7,8 +7,9 @@ import scrapy
 
 
 class CoreItem(scrapy.Item):
-    product_title = scrapy.Field()
-    product_reviews = scrapy.Field()
-    product_rating = scrapy.Field()
-    product_orders = scrapy.Field()
-    product_image = scrapy.Field()
+    Product_Category = scrapy.Field()
+    Product_Title = scrapy.Field()
+    Product_Reviews = scrapy.Field()
+    Product_Rating = scrapy.Field()
+    Product_Orders = scrapy.Field()
+    Product_Image = scrapy.Field()
