@@ -19,7 +19,7 @@
 ```
 6. Run the Scrapping spider
 ```sh
-	scrapy crawl products -o products.csv
+	scrapy crawl products
 ```
 ### Other Commands For Scrapy Shell
 ```sh
