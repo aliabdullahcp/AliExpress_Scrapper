@@ -65,12 +65,15 @@ class ProductsSpider(scrapy.Spider):
 
     def parse_product_details(self, response):
         product = CoreItem()
+
         product['Product_Category'] = response.meta.get('category')
         product['Product_Title'] = response.xpath("//h1[@class='product-title-text']/text()").get()
         product['Product_Rating'] = response.xpath("//span[@class='overview-rating-average']/text()").get()
         product['Product_Image'] = response.xpath("//img[@class='magnifier-image']/@src").get()
+
         reviews = response.xpath("//span[@class='product-reviewer-reviews black-link']/text()").get()
         orders = response.xpath("//span[@class='product-reviewer-sold']/text()").get()
         product['Product_Reviews'] = str(reviews).split()[0]
         product['Product_Orders'] = str(orders).split()[0]
+
         yield product

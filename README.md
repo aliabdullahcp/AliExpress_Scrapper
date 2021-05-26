@@ -8,7 +8,7 @@
 	docker run -it -p 8050:8050 scrapinghub/splash --disable-private-mode
 ```
 3. Open terminal and navigate to your project root directory.
-4. Create a new Virtual Environement and activate it
+4. Create a new Virtual Environment and activate it
 ```sh
 	py -m venv venv
 	venv/Scripts/Activate
