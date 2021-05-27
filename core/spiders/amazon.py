@@ -5,7 +5,7 @@ from scrapy_splash import SplashRequest
 
 class AmazonSpider(scrapy.Spider):
     name = 'amazon'
-    url_prefix = 'https:'
+    url_prefix = 'https://www.amazon.co.uk'
     urls = ['https://www.amazon.co.uk/gp/browse.html?node=10745681&ref_=nav_em__furniture_t2_0_2_13_6#nav-top']
     script = """
                     function main(splash)
@@ -38,20 +38,17 @@ class AmazonSpider(scrapy.Spider):
                                 args={'html': 1, 'lua_source': self.script, 'wait': 2})
 
     def parse(self, response):
-        # featured_categories = response.xpath("//span[@class='a-declarative']/li")
-
-        featured_categories = response.xpath("//span[@class='a-size-medium a-color-base a-text-bold']")
-        for fea_cat in featured_categories:
-            fea_cat_name = fea_cat.xpath(".//text()").get()
-            sub_categories = fea_cat.xpath("//div[@class='a-section octopus-pc-category-card-v2-subcategory']/a")
-            for sub_cat in sub_categories:
-                sub_cat_link = sub_cat.xpath(".//@href").get()
-                sub_cat_name = sub_cat.xpath("//span/text()").get()
+        categories2 = response.xpath("//div[@class='a-section octopus-pc-category-card-v2-item-block']")
+        for cat2 in categories2:
+            cat2_name = cat2.xpath(".//span[@class='a-size-medium a-color-base a-text-bold']/text()").get()
+            categories3 = cat2.xpath("//div[@class='a-section octopus-pc-category-card-v2-subcategory']")
+            print(len(categories3))
+            for cat3 in categories3:
+                cat3_name = cat3.xpath(".//a[@class='a-link-normal octopus-pc-category-card-v2-subcategory-link']/@title").get()
+                # cat3_link = cat3.xpath(".//a/@href").get()
                 yield {
-                    'Featured Category': fea_cat_name,
-                    'Sub Category': sub_cat_name,
-                    'Sub Category Link': sub_cat_link
+                    'Sub-Category-2': cat2_name,
+                    'Sub-Category-3': cat3_name,
+                    # 'Sub-Category-3-Link': self.url_prefix + cat3_link
                 }
-            yield {
-                'fee_cat_name': fea_cat_name
-            }
+            break
